@@ -1,0 +1,21 @@
+{
+  "runs_per_condition": 10,
+  "scenarios": [
+    "steady",
+    "diurnal",
+    "spiky"
+  ],
+  "steps": 96,
+  "step_minutes": 15,
+  "hours_simulated": 24.0,
+  "hosts": 10,
+  "vms": 40,
+  "host_capacity_cpu_units": 100,
+  "host_idle_power_w": 90,
+  "host_max_power_w": 180,
+  "default_underload_threshold": 0.4,
+  "default_upper_threshold": 0.6,
+  "migration_energy_wh_per_vm": 1.0,
+  "seed_policy": "fixed paired seeds within each experiment condition",
+  "note": "Synthetic CPU workloads and illustrative host power values; not measured hardware energy."
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="250" viewBox="0 0 1100 250">
+  <rect width="1100" height="250" rx="18" fill="#f8fafc"/>
+  <g font-family="Arial, sans-serif" text-anchor="middle">
+    <g fill="#ffffff" stroke="#0f766e" stroke-width="3">
+      <rect x="25" y="75" width="180" height="100" rx="14"/>
+      <rect x="245" y="75" width="180" height="100" rx="14"/>
+      <rect x="465" y="75" width="180" height="100" rx="14"/>
+      <rect x="685" y="75" width="180" height="100" rx="14"/>
+      <rect x="905" y="75" width="170" height="100" rx="14"/>
+    </g>
+    <g fill="#0f172a" font-size="21" font-weight="bold">
+      <text x="115" y="116">Workload</text><text x="115" y="146">generator</text>
+      <text x="335" y="116">Host and VM</text><text x="335" y="146">simulator</text>
+      <text x="555" y="116">Consolidation</text><text x="555" y="146">policy</text>
+      <text x="775" y="116">Power and SLA</text><text x="775" y="146">accounting</text>
+      <text x="990" y="116">CSV and SVG</text><text x="990" y="146">results</text>
+    </g>
+    <g stroke="#475569" stroke-width="4" fill="#475569">
+      <line x1="205" y1="125" x2="235" y2="125"/><polygon points="245,125 231,117 231,133"/>
+      <line x1="425" y1="125" x2="455" y2="125"/><polygon points="465,125 451,117 451,133"/>
+      <line x1="645" y1="125" x2="675" y2="125"/><polygon points="685,125 671,117 671,133"/>
+      <line x1="865" y1="125" x2="895" y2="125"/><polygon points="905,125 891,117 891,133"/>
+    </g>
+    <text x="550" y="220" fill="#64748b" font-size="17">Experiment runner repeats paired seeds and writes measurement files</text>
+  </g>
+</svg>
