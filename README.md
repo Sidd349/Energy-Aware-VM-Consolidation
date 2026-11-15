@@ -20,7 +20,7 @@ This single command runs all core experiments and the host-crash injection, writ
 - Consolidation of underloaded hosts, a 60% destination utilization cap, best-fit placement, and a two-interval underload window.
 - Linear host power model: `idle power + (maximum power - idle power) × CPU utilization`.
 - Explicit migration energy cost, migration count, powered-off host-time, CPU overload/SLA accounting, and paired workload seeds.
-- Sensitivity experiments for underload threshold, destination safety cap, VM selection order, and migration cost.
+- Sensitivity experiments for underload threshold, destination safety cap, VM selection order, and migration cost, plus a per-migration break-even analysis.
 - A one-interval host crash and recovery injection in each workload pattern.
 
 ## Project map
@@ -31,6 +31,7 @@ This single command runs all core experiments and the host-crash injection, writ
 | `vmconsolidation/` | Workload generator, simulator, policies, experiment aggregation, chart generation |
 | `results/raw_runs.csv` | Individual runs; use this for re-analysis |
 | `results/summary.csv` | Mean and standard deviation by experiment condition |
+| `results/break_even_summary.csv` | Migration-energy penalty at which consolidation's modeled savings equal the baseline |
 | `results/failure_injection.csv` | Individual failure-injection runs |
 | `results/figures/` | SVG charts generated from the summary data |
 | `docs/architecture.svg` | Ready-to-view architecture diagram |

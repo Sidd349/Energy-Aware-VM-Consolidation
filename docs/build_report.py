@@ -128,6 +128,7 @@ def make_architecture_diagram() -> Drawing:
 def build() -> None:
     rows = read_csv("summary.csv")
     fail_rows = read_csv("failure_summary.csv")
+    break_even_rows = read_csv("break_even_summary.csv")
     scenarios = ["steady", "diurnal", "spiky"]
     py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
@@ -175,6 +176,13 @@ def build() -> None:
         failure_table.append([scenario.title(), fmt(r["mean_failure_vm_steps_lost"], 1),
                               fmt(r["mean_recovery_time_minutes"], 0),
                               fmt(r["mean_sla_host_steps"], 1), fmt(r["mean_migrations"], 1)])
+
+    break_even_table = []
+    for scenario in scenarios:
+        r = next(x for x in break_even_rows if x["scenario"] == scenario)
+        break_even_table.append([scenario.title(), fmt(r["mean_migrations"]),
+                                 fmt(r["mean_break_even_migration_energy_wh"], 1),
+                                 fmt(r["std_break_even_migration_energy_wh"], 1)])
 
     # Report source is deliberately split into 14 sections/pages for direct editing.
     sections: list[tuple[str, list[str]]] = []
@@ -227,7 +235,8 @@ def build() -> None:
     ]))
     sections.append(("8. Results: Baseline and Consolidation", [
         "The following table reports means over 10 runs per condition. Baseline and consolidated runs use the same workload seeds. Consolidated energy includes the default 1 Wh per VM migration.",
-        "Measured main results:"
+        "Measured main results:",
+        "The break-even migration penalty is (baseline energy - consolidated host energy) divided by the number of migrations. At or above this cost per migrated VM, the same consolidation plan no longer saves energy compared with the baseline. This is a measured cost boundary; the policy does not dynamically cancel individual migrations."
     ]))
     sections.append(("9. Results: Sensitivity and Stretch Goal", [
         "Destination cap sensitivity shows the central trade-off: tighter caps use more hosts and more energy but suppress overload events; higher caps save more energy while raising SLA violations under diurnal and bursty demand. At 55%, mean host-time violations were 0 for diurnal and 0.6 host-steps for spiky demand; at 70%, they rose to 81.4 and 39.7 respectively.",
@@ -248,7 +257,7 @@ def build() -> None:
         "The simulator supports the conclusion that consolidation can reduce modeled energy when the initial placement leaves underused hosts. In the included configuration, savings range from 22.5% to 38.2% across workload patterns. The destination cap controls the energy/SLA trade-off: packing more tightly can reduce energy, but dynamic peaks create more host-time violations. The 60% cap provides a more conservative result than the 65-70% caps tested, while still reducing modeled energy.",
         "Limitations: CPU is the only resource; wattage values are illustrative; VM CPU traces are synthetic; there is no boot/sleep delay; a switched-off host is assumed to consume zero power; migration cost is a fixed per-VM penalty; workload demands are treated as known at each interval; no memory, disk, network, cooling, carbon intensity, or real hypervisor overhead is modeled. Failure recovery is a one-interval host restart rather than redundant replication or rescheduling to other hosts.",
         "Next improvements could use a public workload trace with its terms cited, add memory/network constraints, model transition energy and migration downtime, compare threshold controllers with predictive placement, and add recovery by relocating VMs after a permanent host failure.",
-        "Conclusion: The project satisfies the handout's simulator, changing-load, underloaded-host migration, power-model, energy comparison, migration count, SLA, repeatability, stretch-policy, and failure-injection goals. The main lesson is that energy savings must be evaluated alongside service violations and migration overhead, not in isolation."
+        "Conclusion: The project implements the handout's simulator, changing-load, underloaded-host migration, power-model, energy comparison, migration count, SLA, repeatability, stretch-policy, break-even, and failure-injection goals. The team still needs to produce its live or recorded demo and complete the signed contribution statement. The main lesson is that energy savings must be evaluated alongside service violations and migration overhead, not in isolation."
     ]))
     sections.append(("13. Tools, References and Team Contributions", [
         f"Tools used: Python {py_version} with the Python Software Foundation License 2.0 for the simulator and standard library; ReportLab 4.4.9 under its BSD license for optional PDF generation; Git 2.52.0 under GNU GPL version 2 for version control. No paid tools, cloud accounts, or external datasets are used. The runtime has no third-party dependencies.",
@@ -260,7 +269,9 @@ def build() -> None:
     # Include explicit Markdown tables on the pages where results are presented.
     page_extra: dict[int, list[tuple[str, list[list[str]]]]] = {
         9: [("Baseline versus consolidation (mean of 10 paired runs)",
-             [["Workload", "Baseline Wh", "Consolidated Wh", "Saved", "Migrations", "SLA rate"]] + main_table)],
+             [["Workload", "Baseline Wh", "Consolidated Wh", "Saved", "Migrations", "SLA rate"]] + main_table),
+            ("Break-even migration penalty (Wh per migrated VM)",
+             [["Workload", "Migrations", "Break-even penalty", "SD"]] + break_even_table)],
         10: [("Destination cap sensitivity (10 runs per workload and cap)",
              [["Workload", "Cap", "Energy Wh", "SLA host-steps"]] + upper_table)],
         11: [("Underload threshold sensitivity (10 runs per workload and threshold)",

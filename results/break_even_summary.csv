@@ -1,0 +1,4 @@
+scenario,runs,mean_baseline_energy_wh,mean_consolidated_host_energy_wh,mean_migrations,mean_break_even_migration_energy_wh,std_break_even_migration_energy_wh
+steady,10,29427.302,22801.052,14.4,462.6161,50.4071
+diurnal,10,28486.4122,17585.123,22,496.1166,27.0773
+spiky,10,29678.0855,22192.4969,15.5,482.4675,41.6943

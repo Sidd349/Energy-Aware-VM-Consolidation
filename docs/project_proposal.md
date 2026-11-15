@@ -18,7 +18,7 @@ The simulator will model 10 hosts and 40 VMs over 24 hours using 96 fifteen-minu
 
 ## Measurements and experiments
 
-For each condition, run at least 10 fixed-seed repetitions. Report modeled energy in Wh, percentage energy change relative to baseline, migrations, CPU overload/SLA host-steps, and powered-off host-time. Sweep the underload threshold and destination cap. Compare smallest-first and largest-first VM selection. Vary the assumed migration-energy penalty. Inject a one-interval host crash at the midpoint and record unavailable VM-steps and recovery time.
+For each condition, run at least 10 fixed-seed repetitions. Report modeled energy in Wh, percentage energy change relative to baseline, migrations, CPU overload/SLA host-steps, and powered-off host-time. Sweep the underload threshold and destination cap. Compare smallest-first and largest-first VM selection. Vary the assumed migration-energy penalty and calculate the per-migration break-even point where consolidation no longer saves modeled energy relative to the baseline. Inject a one-interval host crash at the midpoint and record unavailable VM-steps and recovery time.
 
 ## Tools, limits, and expected deliverables
 

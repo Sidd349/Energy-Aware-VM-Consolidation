@@ -91,6 +91,8 @@ The following table reports means over 10 runs per condition. Baseline and conso
 
 Measured main results:
 
+The break-even migration penalty is (baseline energy - consolidated host energy) divided by the number of migrations. At or above this cost per migrated VM, the same consolidation plan no longer saves energy compared with the baseline. This is a measured cost boundary; the policy does not dynamically cancel individual migrations.
+
 **Baseline versus consolidation (mean of 10 paired runs)**
 
 | Workload | Baseline Wh | Consolidated Wh | Saved | Migrations | SLA rate |
@@ -98,6 +100,14 @@ Measured main results:
 | Steady | 29,427.3 | 22,815.5 | 22.5% | 14.4 | 0.00% |
 | Diurnal | 28,486.4 | 17,607.1 | 38.2% | 22.0 | 0.14% |
 | Spiky | 29,678.1 | 22,208.0 | 25.2% | 15.5 | 2.08% |
+
+**Break-even migration penalty (Wh per migrated VM)**
+
+| Workload | Migrations | Break-even penalty | SD |
+|---|---|---|---|
+| Steady | 14.4 | 462.6 | 50.4 |
+| Diurnal | 22.0 | 496.1 | 27.1 |
+| Spiky | 15.5 | 482.5 | 41.7 |
 
 ## 9. Results: Sensitivity and Stretch Goal
 
@@ -195,7 +205,7 @@ Limitations: CPU is the only resource; wattage values are illustrative; VM CPU t
 
 Next improvements could use a public workload trace with its terms cited, add memory/network constraints, model transition energy and migration downtime, compare threshold controllers with predictive placement, and add recovery by relocating VMs after a permanent host failure.
 
-Conclusion: The project satisfies the handout's simulator, changing-load, underloaded-host migration, power-model, energy comparison, migration count, SLA, repeatability, stretch-policy, and failure-injection goals. The main lesson is that energy savings must be evaluated alongside service violations and migration overhead, not in isolation.
+Conclusion: The project implements the handout's simulator, changing-load, underloaded-host migration, power-model, energy comparison, migration count, SLA, repeatability, stretch-policy, break-even, and failure-injection goals. The team still needs to produce its live or recorded demo and complete the signed contribution statement. The main lesson is that energy savings must be evaluated alongside service violations and migration overhead, not in isolation.
 
 ## 13. Tools, References and Team Contributions
 

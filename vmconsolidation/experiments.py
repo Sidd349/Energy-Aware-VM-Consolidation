@@ -76,6 +76,7 @@ def run_all(runs: int, out_dir: Path) -> Tuple[List[ExperimentRow], List[Failure
     _write_csv(out_dir / "raw_runs.csv", [asdict(row) for row in rows])
     summary = summarize(rows)
     _write_csv(out_dir / "summary.csv", summary)
+    _write_csv(out_dir / "break_even_summary.csv", break_even_summary(rows))
     metadata = {
         "runs_per_condition": runs,
         "scenarios": list(SCENARIOS),
@@ -162,6 +163,51 @@ def summarize(rows: List[ExperimentRow]) -> List[dict]:
             group[f"mean_{label}"] = round(mean, 4)
             group[f"std_{label}"] = round(std, 4)
         output.append(group)
+    return output
+
+
+def break_even_summary(rows: List[ExperimentRow]) -> List[dict]:
+    """Find the per-migration energy penalty that cancels baseline savings.
+
+    This is calculated for each paired seed as:
+      (baseline total energy - consolidated host energy) / VM migrations.
+    At or above this penalty, the unchanged consolidation plan no longer saves
+    energy versus the baseline. It is an analytical break-even boundary, not a
+    dynamic stop rule inside the placement policy.
+    """
+    paired: Dict[Tuple[str, int], Dict[str, ExperimentRow]] = {}
+    for row in rows:
+        if row.experiment != "baseline_comparison":
+            continue
+        paired.setdefault((row.scenario, row.seed), {})[row.mode] = row
+
+    output: List[dict] = []
+    for scenario in SCENARIOS:
+        values = []
+        baseline_energy = []
+        host_energy = []
+        migrations = []
+        for (case, _seed), modes in paired.items():
+            if case != scenario or "baseline" not in modes or "consolidated" not in modes:
+                continue
+            base = modes["baseline"]
+            consolidated = modes["consolidated"]
+            if consolidated.migrations <= 0:
+                continue
+            values.append((base.energy_wh - consolidated.host_energy_wh) / consolidated.migrations)
+            baseline_energy.append(base.energy_wh)
+            host_energy.append(consolidated.host_energy_wh)
+            migrations.append(consolidated.migrations)
+        mean, std = _mean_std(values)
+        output.append({
+            "scenario": scenario,
+            "runs": len(values),
+            "mean_baseline_energy_wh": round(statistics.mean(baseline_energy), 4) if baseline_energy else 0.0,
+            "mean_consolidated_host_energy_wh": round(statistics.mean(host_energy), 4) if host_energy else 0.0,
+            "mean_migrations": round(statistics.mean(migrations), 4) if migrations else 0.0,
+            "mean_break_even_migration_energy_wh": round(mean, 4),
+            "std_break_even_migration_energy_wh": round(std, 4),
+        })
     return output
 
 
