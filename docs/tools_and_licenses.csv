@@ -1,4 +1,0 @@
-Tool,Version,License,Use
-Python,3.12.14,Python Software Foundation License 2.0,Simulator and experiment scripts; standard library only
-ReportLab,4.4.9,BSD license,Optional generation of the included report PDF
-Git,2.52.0,GNU General Public License version 2,Version control repository

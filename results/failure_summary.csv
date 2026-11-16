@@ -1,4 +1,0 @@
-scenario,runs,mean_failure_vm_steps_lost,std_failure_vm_steps_lost,mean_failure_cpu_demand_lost,std_failure_cpu_demand_lost,mean_recovery_time_minutes,std_recovery_time_minutes,mean_total_energy_wh,std_total_energy_wh,mean_migrations,std_migrations,mean_sla_host_steps,std_sla_host_steps
-steady,10,6.6,0.5164,61.7493,2.2126,15,0.0,22860.7555,785.7201,14.4,1.075,1,0.0
-diurnal,10,9.7,0.483,96.0888,2.5819,15,0.0,17834.5523,243.507,21.7,1.1595,1.1,0.3162
-spiky,10,6.8,0.4216,62.3718,2.5043,15,0.0,22679.3197,1208.76,15.3,0.6749,11.6,6.059

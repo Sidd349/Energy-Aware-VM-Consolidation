@@ -1,71 +1,94 @@
 # Energy-Aware VM Consolidation
 
-Mini project for **CSN349 Cloud Computing**. This is a local, deterministic Python simulator: it models VM CPU loads on physical hosts, migrates VMs off underloaded hosts, switches empty hosts off, and compares modeled energy and SLA outcomes with a no-consolidation baseline.
+A Python + Streamlit simulation of energy-aware virtual machine (VM) consolidation in a data centre.
 
-## Start the project
+## Features
+- Simulates physical hosts and VMs with changing CPU demand.
+- Compares No Consolidation, Threshold-Based, and Best-Fit Consolidation policies.
+- Migrates VMs from underutilized hosts when a safe destination is available.
+- Powers off empty hosts.
+- Calculates host power using the assignment's linear power model:
+  `P = P_idle + (P_max - P_idle) * CPU_utilization`
+- Adds a configurable energy cost per migration.
+- Reports migrations, powered-off hosts, and SLA violations.
+- Provides an interactive Streamlit dashboard and CSV exports.
 
-Requires Python 3.10 or newer. The simulator uses only the Python standard library; no cloud account, paid service, dataset, Docker, or third-party runtime package is needed.
+## Requirements
+- Python 3.10+
+- Windows, Linux, or macOS
+- VS Code (recommended)
 
-```bash
-python run_project.py all --runs 10
+## Run on Windows (PowerShell)
+
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run main.py
 ```
 
-This single command runs all core experiments and the host-crash injection, writing reproducible CSV and SVG outputs under `results/`. It requires at least 10 runs per condition, matching the project's repeated-measurement requirement. To rebuild the report PDF after changing results, install the optional report dependency listed in `requirements-report.txt` and run `python docs/build_report.py`.
+If PowerShell blocks activation, use:
 
-## What is implemented
-
-- 10 hosts, 40 VMs, 24 simulated hours, and 96 fifteen-minute intervals.
-- Three deterministic synthetic workload patterns: steady, diurnal, and spiky.
-- Baseline with static placement and no consolidation.
-- Consolidation of underloaded hosts, a 60% destination utilization cap, best-fit placement, and a two-interval underload window.
-- Linear host power model: `idle power + (maximum power - idle power) × CPU utilization`.
-- Explicit migration energy cost, migration count, powered-off host-time, CPU overload/SLA accounting, and paired workload seeds.
-- Sensitivity experiments for underload threshold, destination safety cap, VM selection order, and migration cost, plus a per-migration break-even analysis.
-- A one-interval host crash and recovery injection in each workload pattern.
-
-## Project map
-
-| Path | Purpose |
-|---|---|
-| `run_project.py` | One-command experiment entry point |
-| `vmconsolidation/` | Workload generator, simulator, policies, experiment aggregation, chart generation |
-| `results/raw_runs.csv` | Individual runs; use this for re-analysis |
-| `results/summary.csv` | Mean and standard deviation by experiment condition |
-| `results/break_even_summary.csv` | Migration-energy penalty at which consolidation's modeled savings equal the baseline |
-| `results/failure_injection.csv` | Individual failure-injection runs |
-| `results/figures/` | SVG charts generated from the summary data |
-| `docs/architecture.svg` | Ready-to-view architecture diagram |
-| `docs/architecture.mmd` | Editable Mermaid architecture source |
-| `docs/project_proposal.md` | One-page project proposal |
-| `docs/report.md` and `docs/report.pdf` | Editable report source and 14-page report |
-| `docs/demo_script.md` | Ten-minute demonstration outline |
-| `docs/contributions.md` | Team contribution statement template |
-
-## Reproduce or extend
-
-```bash
-python run_project.py all --runs 10
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\venv\Scripts\Activate.ps1
 ```
 
-Increase `--runs` to reduce sampling noise. Workloads use fixed seeds so paired baseline/consolidated runs receive the same demand trace. Edit `SimulationConfig` in `vmconsolidation/models.py` to change hosts, VMs, interval length, or thresholds. Adjust the experiment sets in `vmconsolidation/experiments.py` to add scenarios. The report's results are generated from the included 10-run CSV files; regenerate the report after changing experiment settings.
-
-## Commit to your team's remote repository
-
-The project folder is initialized as a Git repository. After filling in the team members and contribution statement, make the team's first commit and add the remote created by your team:
+## Run on Ubuntu
 
 ```bash
-git add .
-git commit -m "Build energy-aware VM consolidation simulator"
-git remote add origin <your-team-repository-url>
-git push -u origin main
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+streamlit run main.py
 ```
 
-## Interpret the numbers correctly
+## How to use
+1. Start the app with `streamlit run main.py`.
+2. Adjust hosts, VMs, simulation steps, thresholds, and power values in the sidebar.
+3. Click **Run simulation**.
+4. Compare energy, migration count, powered-off hosts, and SLA violations.
+5. Download CSV results from the Raw data tab.
 
-All workloads are synthetic and all host power values are illustrative assumptions. The outputs are **modeled Wh**, not readings from a physical server. A VM's CPU demand is treated as known to the simulator; the simulator does not boot real VMs or perform live migration. The default migration energy is an assumed 1 Wh per migrated VM. The failure experiment removes the busiest active host for one interval, counts unavailable VM-time as an SLA violation, and restores it on the next interval.
+## Model assumptions and limitations
+- This is a discrete-time simulator, not a hypervisor or live migration implementation.
+- CPU demand is expressed in normalized capacity units.
+- Each host has one CPU capacity value; RAM, storage, network bandwidth, and heterogeneous hardware are not modelled.
+- Migration energy is represented by a configurable fixed Wh cost per VM migration.
+- Migration time is approximated by VM memory size divided by a conceptual fixed bandwidth; the simplified policy selector uses memory size as a proxy.
+- The power model is linear between idle and maximum power.
+- SLA violations count active hosts whose demand exceeds their CPU capacity. Safe placement is intended to avoid overload.
+- Workload traces are synthetic and seeded for reproducibility.
+- Threshold-Based uses first-fit destination placement, while Best-Fit Consolidation selects the eligible destination with the least remaining capacity after placement.
+- Both consolidation policies use the configured underload threshold to identify candidate source hosts.
 
-The included report discusses model limitations, assumptions, results, and reproducibility. Replace the blank team names and contribution signatures before submission, and make sure every team member can explain the code and actual experiment output.
+## Suggested report measurements
+- Total energy without consolidation vs. with consolidation.
+- Migration count and migration energy.
+- Number of hosts switched off.
+- SLA violations.
+- Energy savings percentage:
+  `(baseline_energy - consolidated_energy) / baseline_energy * 100`
+- Net savings after migration cost.
 
-## Tools and licenses
-
-See `docs/tools_and_licenses.csv`. The runtime simulator needs only Python and its standard library. Report generation uses optional ReportLab; the PDF is already included.
+## Project structure
+```text
+Energy-Aware-VM-Consolidation/
+├── main.py
+├── config.py
+├── simulation/
+│   ├── __init__.py
+│   ├── models.py
+│   ├── workload.py
+│   └── engine.py
+├── algorithms/
+│   ├── __init__.py
+│   └── policies.py
+├── metrics/
+│   ├── __init__.py
+│   ├── energy.py
+│   └── sla.py
+├── dashboard/
+├── results/
+└── requirements.txt
+```

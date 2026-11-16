@@ -1,2 +1,0 @@
-# Optional: only needed to regenerate docs/report.pdf.
-reportlab==4.4.9
